@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_backgroundmain"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:cacheColorHint="#00000000"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="5.0dip"
+        android:paddingLeft="10.0dip"
+        android:paddingRight="10.0dip" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bggroupboxtop"
+            android:orientation="horizontal"
+            android:padding="8.0dip" >
+
+            <ImageView
+                android:id="@+id/img_en_lang"
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/en"
+                 />
+            <ImageView
+                android:id="@+id/img_vi_lang"
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:layout_marginRight="10dip"
+                android:layout_toLeftOf="@+id/img_en_lang"
+                android:src="@drawable/vi"
+                 />
+
+            
+        </RelativeLayout>
+		
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="52.0dip"
+            android:background="@drawable/bggroupboxmiddle"
+            android:orientation="horizontal"
+            android:padding="8.0dip" >
+
+            <TextView
+                android:id="@+id/tv_callid"
+                android:layout_width="100.0dip"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/tel_callid_spam"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_callid"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="100.0dip"
+                
+                android:singleLine="true"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="52.0dip"
+            android:background="@drawable/bggroupboxmiddle"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8.0dip" >
+
+            <TextView
+                android:id="@+id/tv_interval"
+                android:layout_width="100.0dip"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/tel_call_interval"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_interval"
+                android:inputType="number"
+                android:text="10"
+               
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/tv_interval"
+                android:gravity="center_vertical"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip" />
+        </RelativeLayout>
+        
+         <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="52.0dip"
+            android:background="@drawable/bggroupboxmiddle"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8.0dip" >
+
+            <TextView
+                android:id="@+id/tv_hangup_timeout"
+                android:layout_width="100.0dip"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/tel_call_hang_timeout"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_hangup_timeout"
+                android:inputType="number"
+                android:text="6"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/tv_hangup_timeout"
+                android:gravity="center_vertical"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip" />
+        </RelativeLayout>
+         
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="52.0dip"
+            android:background="@drawable/bggroupboxmiddle"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8.0dip" >
+
+            <TextView
+                android:id="@+id/tv_stats"
+                android:layout_width="100.0dip"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/tel_call_stats"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_stats_content"
+                android:text="0"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/tv_stats"
+                android:gravity="center_vertical"
+                android:textColor="@color/text_violet"
+                android:textSize="14.0dip" />
+           
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bggroupboxbottom"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8.0dip" >
+			
+            <Button android:id="@+id/btn_start_stop" android:textColor="@color/text_violet" android:text="@string/tel_start" android:background="@drawable/bgstartstop" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+			<TextView android:textSize="12sp" android:layout_below="@+id/btn_start_stop" android:text="Written by Siro - 2014" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+       
+    </LinearLayout>
+
+</LinearLayout>

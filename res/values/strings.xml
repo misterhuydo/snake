@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2007 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+  <string name="app_name">Naughty Snake</string>
+  <string name="mode_ready">Snake\nPress Up To Play</string>
+  <string name="mode_pause">Paused\nPress Up To Resume</string>
+  <string name="mode_lose">Game Over\nScore: %1$d \nPress Up To Play</string>
+  <string name="tel_callid_spam">Phone number(s)</string>
+  <string name="tel_callid_hint">Example: 0909456xxx;0906456xxx</string>
+  <string name="tel_call_interval">Call back after: (in sec)</string>
+  <string name="tel_call_hang_timeout">Hang up after: (in sec)</string>
+  <string name="tel_call_stats">Number of calls:</string>
+  <string name="tel_start">Start</string>
+  <string name="tel_stop">Stop</string>
+  <string name="tel_warning_call_interval">Call interval not smaller than 10 seconds</string>
+  <string name="tel_warning_call_hangup">Hang up timeout after call not greater than 10 seconds</string>
+</resources>
