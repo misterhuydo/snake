@@ -272,8 +272,10 @@ public class Main extends Activity{
 				Log.w("State changed: " , state+"Idle");
 				if (isPhoneCalling) {
 
+					//enable back
+					startSendingCall();
 					isPhoneCalling = false;
-
+					
 				}
 
 				break;
@@ -287,6 +289,11 @@ public class Main extends Activity{
 						hangUp();
 					}
 				}
+				//temporay set cancel
+				if(timer!=null){
+					timer.cancel();
+				}
+				
 				
 				
 				break;

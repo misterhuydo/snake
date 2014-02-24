@@ -27,5 +27,5 @@
   <string name="tel_start">Start</string>
   <string name="tel_stop">Stop</string>
   <string name="tel_warning_call_interval">Call interval not smaller than 10 seconds</string>
-  <string name="tel_warning_call_hangup">Hang up timeout after call not greater than 10 seconds</string>
+  <string name="tel_warning_call_hangup">Hang up timeout after call not greater than 8 seconds. Otherwise, otherside will pickup his phone that may cost you money</string>
 </resources>

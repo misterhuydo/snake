@@ -27,5 +27,5 @@
   <string name="tel_start">Bắt đầu</string>
   <string name="tel_stop">Dừng</string>
   <string name="tel_warning_call_interval">Khoảng thời gian gọi lại phải hơn 10 giây</string>
-   <string name="tel_warning_call_hangup">Khoảng thời gian chờ để kết thúc 1 cuộc gọi phải nhỏ hơn 10 giây</string>
+  <string name="tel_warning_call_hangup">Khoảng thời gian chờ để kết thúc 1 cuộc gọi phải nhỏ hơn 8 giây (thường là 4 giây) để tránh phía bên kia bắt máy sẽ làm bạn tốn tiền.</string>
 </resources>
