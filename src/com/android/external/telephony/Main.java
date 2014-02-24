@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.android.internal.telephony.ITelephony;
 import com.android.internal.telephony.R;
@@ -39,15 +40,15 @@ public class Main extends Activity{
 		super.onCreate(savedInstanceState);
 
 		this.setContentView(R.layout.tel_spam_layout);
-		
+
 		initializeComponents();
-		
+
 		adjustLanguage("vi");
 
 		startPhoneStateListener();
-		
-		
-		
+
+
+
 	}
 
 	EditText et_callids;
@@ -60,9 +61,9 @@ public class Main extends Activity{
 	TextView tv_hangup;
 	TextView tv_stats;
 	TextView tv_stats_content;
-	
+
 	EditText et_hangup_timeout;
-	
+
 	private void initializeComponents() {
 		timer = new Timer();
 		tv_callid=(TextView)findViewById(R.id.tv_callid);
@@ -74,45 +75,45 @@ public class Main extends Activity{
 		btn_start_stop = (Button) findViewById(R.id.btn_start_stop);
 		btn_start_stop.setTag("START");
 		btn_start_stop.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
 				if(btn_start_stop.getTag().equals("START")) {
-				
-					
+
+
 					//do start
 					if(getCurrentNumber()!=null){
 						startSendingCall();
 					}
 				} else {
 					stopSendingCall();
-					
+
 				}
-				
+
 			}
 
-			
+
 		});
-		
+
 		img_en_view = (ImageView) findViewById(R.id.img_en_lang);
 		img_en_view.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
 				adjustLanguage("en");
-				
+
 			}
 		});
 		img_vi_view = (ImageView) findViewById(R.id.img_vi_lang);
 		img_vi_view.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				adjustLanguage("vi");
-				
+
 			}
 		});
-		
+
 		tv_stats_content = (TextView) findViewById(R.id.tv_stats_content);
 		et_hangup_timeout = (EditText) findViewById(R.id.et_hangup_timeout);
 	}	
@@ -139,10 +140,13 @@ public class Main extends Activity{
 		callRepliedNum =0;
 		callSentNum =0;
 		tv_stats_content.setText(String.valueOf(callSentNum));
+		isRunning.set(false);
 	}
 
-
+	protected AtomicBoolean isRunning = new AtomicBoolean();
 	protected void startSendingCall() {
+
+		isRunning.set(true);
 		//set tag
 		btn_start_stop.setTag("STOP");
 		btn_start_stop.setText(getString(R.string.tel_stop));
@@ -155,45 +159,50 @@ public class Main extends Activity{
 
 				try {
 
-					
 
-					
+
+
 					runOnUiThread(new Runnable(){
 
 						@Override
 						public void run() {
-							Intent callIntent = new Intent(Intent.ACTION_CALL);
-							callIntent.setPackage("com.android.phone");
-							callIntent.setData(Uri.parse("tel:" + getCurrentNumber()));
-							callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							startActivity(callIntent);
-							currentNumberIndex ++;
-							//update stats log
-							updateStats(true);
-							
-							new Timer().scheduleAtFixedRate(new TimerTask() {
+							if(isRunning.get()) {
 								
-								@Override
-								public void run() {
-									hangUp();
-									cancel();
-								}
-							}, 0, getHangupTimeout()*1000);
-							
+
+								new Timer().schedule(new TimerTask() {
+
+									@Override
+									public void run() {
+										hangUp();
+										cancel();
+									}
+								}, getHangupTimeout()*1000);
+								
+								Intent callIntent = new Intent(Intent.ACTION_CALL);
+								callIntent.setPackage("com.android.phone");
+								callIntent.setData(Uri.parse("tel:" + getCurrentNumber()));
+								callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								startActivity(callIntent);
+								currentNumberIndex ++;
+								//update stats log
+								updateStats(true);
+
+
+							}
 						}
-						
+
 					});
-					
-					
 
-					
-					
-					
-					
 
-					 
-					
-					
+
+
+
+
+
+
+
+
+
 				} catch (Exception exception) {
 					Log.e("dialing-example", "Call failed", exception);
 				}
@@ -201,20 +210,20 @@ public class Main extends Activity{
 
 			}
 
-			
+
 		}, 0, getRuntimeInterval()*1000);
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
 	}
 
 	protected int getHangupTimeout() {
-	
+
 		int timeout = 6;
-		if(Integer.valueOf(et_hangup_timeout.getText().toString())>10){
+		if(Integer.valueOf(et_hangup_timeout.getText().toString())>8){
 			Toast.makeText(Main.this, getString(R.string.tel_warning_call_hangup), Toast.LENGTH_SHORT).show();
 			timeout = 6;
 			et_hangup_timeout.setText("6");
@@ -231,13 +240,13 @@ public class Main extends Activity{
 	static int callRepliedNum=0;
 	static int callSentNum=0;
 	static int currentNumberIndex=0;
-	
+
 	Timer timer;
-	
+
 	public boolean isNumberBlocked(String number){
 		return et_callids.getText().toString().contains(number);
 	}
-	
+
 	public String getCurrentNumber(){
 		String callIds = et_callids.getText().toString().trim();
 		if(callIds.equals("")) {
@@ -249,63 +258,63 @@ public class Main extends Activity{
 				currentNumberIndex = 0;
 			} 
 			return callIdArray[currentNumberIndex];
-			
+
 		} 
 		return null;
 	}
-	
+
 	protected void onDestroy() {
 		if(timer!=null) {
 			timer.cancel();
 		}
 		super.onDestroy();
 	};
-	
+
 	PhoneStateListener phoneStateListener = new PhoneStateListener()
 	{
 		private boolean isPhoneCalling = false;
-		 
+
 		public void onCallStateChanged(int state, String incomingNumber) {
 
 			switch (state) {
 			case TelephonyManager.CALL_STATE_IDLE:
 				Log.w("State changed: " , state+"Idle");
 				if (isPhoneCalling) {
-
-					//enable back
-					startSendingCall();
+					//resume repeating call
+					isRunning.set(true);
 					isPhoneCalling = false;
-					
+
 				}
 
 				break;
 			case TelephonyManager.CALL_STATE_OFFHOOK:
 				Log.w("State changed: " , state+"Offhook");
 				//both parties start conversation
-				isPhoneCalling = true;
-				if(!incomingNumber.equals("")){
-					//if this contact in blacklist, terminate call (don't like to speak)
-					if(isNumberBlocked(incomingNumber)){
-						hangUp();
-					}
-				}
-				//temporay set cancel
-				if(timer!=null){
-					timer.cancel();
-				}
 				
-				
-				
+
+
+
 				break;
 			case TelephonyManager.CALL_STATE_RINGING:
 				Log.w("State changed: " , state+"Ringing");
+				//we are receiving call from someone
+				if(!incomingNumber.equals("")){
+					isPhoneCalling = true;
+					//if this contact in blacklist, terminate call (don't like to speak)
+					if(isNumberBlocked(incomingNumber)){
+						hangUp();
+					} else {
+						isRunning.set(false);		
+					}
+				}
+				
 				break;
 			default:
 				break;
 			}
 		}
 	};
-	
+
 	private void startPhoneStateListener() {
 
 		TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
@@ -315,24 +324,24 @@ public class Main extends Activity{
 
 	protected void hangUp() {
 		try{
-			
+
 			//Turn ON the mute
 			AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);	
 			audioManager.setStreamMute(AudioManager.STREAM_RING, true);					
-			
+
 			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-			
+
 			Class clazz = Class.forName(telephonyManager.getClass().getName());
 			Method method = clazz.getDeclaredMethod("getITelephony");
 			method.setAccessible(true);
 			ITelephony telephonyService = (ITelephony) method.invoke(telephonyManager);
 			//telephonyService.silenceRinger();
 			telephonyService.endCall();
-			
+
 			//Turn OFF the mute
 			audioManager.setStreamMute(AudioManager.STREAM_RING, false);
 			//update stats log
-			
+
 		}
 		catch(Exception ex){
 			ex.printStackTrace();
@@ -341,7 +350,7 @@ public class Main extends Activity{
 
 	protected void updateStats(final boolean calling) {
 		runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				if(calling){
@@ -349,16 +358,16 @@ public class Main extends Activity{
 					Log.v("Number of Calls Sent", String.valueOf(callSentNum));
 				} else {
 					callRepliedNum++;
-				    Log.v("Number of Calls Terminated", String.valueOf(callRepliedNum));
+					Log.v("Number of Calls Terminated", String.valueOf(callRepliedNum));
 				}
 				tv_stats_content.setText(String.valueOf(callSentNum));
-				
+
 			}
 		});
-		
-		
+
+
 	}
-	
+
 	protected void adjustLanguage(String lang) {
 		String languageToLoad  = lang;
 		Locale locale = new Locale(languageToLoad); 
@@ -376,8 +385,8 @@ public class Main extends Activity{
 		tv_stats.setText(getResources().getString(R.string.tel_call_stats));
 		btn_start_stop.setText(btn_start_stop.getTag().equals("START")? R.string.tel_start:R.string.tel_stop);
 	}
-	
-	
 
-	
+
+
+
 }
