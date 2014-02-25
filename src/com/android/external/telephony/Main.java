@@ -1,5 +1,6 @@
 package com.android.external.telephony;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
@@ -15,18 +16,28 @@ import com.android.internal.telephony.R;
 import com.android.internal.telephony.R.layout;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -47,8 +58,7 @@ public class Main extends Activity{
 
 		startPhoneStateListener();
 
-
-
+		
 	}
 
 	EditText et_callids;
@@ -116,18 +126,25 @@ public class Main extends Activity{
 
 		tv_stats_content = (TextView) findViewById(R.id.tv_stats_content);
 		et_hangup_timeout = (EditText) findViewById(R.id.et_hangup_timeout);
+
+		load();
 	}	
 
 	protected int getRuntimeInterval() {
-		int interval = 10;
-		if(Integer.valueOf(et_interval.getText().toString())<10){
-			Toast.makeText(Main.this, getString(R.string.tel_warning_call_interval), Toast.LENGTH_SHORT).show();
-			interval = 10;
+		if(et_interval.getText().length()==0){
 			et_interval.setText("10");
+			return 10;
 		} else {
-			interval = Integer.valueOf(et_interval.getText().toString());
+			int interval = 10;
+			if(Integer.valueOf(et_interval.getText().toString())<10){
+				Toast.makeText(Main.this, getString(R.string.tel_warning_call_interval), Toast.LENGTH_LONG).show();
+				interval = 10;
+				et_interval.setText("10");
+			} else {
+				interval = Integer.valueOf(et_interval.getText().toString());
+			}
+			return interval;
 		}
-		return interval;
 	}
 
 	protected void stopSendingCall() {
@@ -135,17 +152,23 @@ public class Main extends Activity{
 			timer.cancel();
 		}
 		//reset
+		setEnableDisableComponents(true);
 		btn_start_stop.setTag("START");
 		btn_start_stop.setText(getString(R.string.tel_start));
 		callRepliedNum =0;
 		callSentNum =0;
 		tv_stats_content.setText(String.valueOf(callSentNum));
 		isRunning.set(false);
+
+
 	}
 
 	protected AtomicBoolean isRunning = new AtomicBoolean();
 	protected void startSendingCall() {
 
+		setEnableDisableComponents(false);
+
+	
 		isRunning.set(true);
 		//set tag
 		btn_start_stop.setTag("STOP");
@@ -167,17 +190,21 @@ public class Main extends Activity{
 						@Override
 						public void run() {
 							if(isRunning.get()) {
-								
 
 								new Timer().schedule(new TimerTask() {
 
 									@Override
 									public void run() {
+										
 										hangUp();
 										cancel();
+										
 									}
 								}, getHangupTimeout()*1000);
 								
+
+							
+
 								Intent callIntent = new Intent(Intent.ACTION_CALL);
 								callIntent.setPackage("com.android.phone");
 								callIntent.setData(Uri.parse("tel:" + getCurrentNumber()));
@@ -186,6 +213,8 @@ public class Main extends Activity{
 								currentNumberIndex ++;
 								//update stats log
 								updateStats(true);
+
+								
 
 
 							}
@@ -217,24 +246,35 @@ public class Main extends Activity{
 
 
 
+	}
 
+	private void setEnableDisableComponents(boolean enabled) {
+
+		et_callids.setEnabled(enabled);
+		et_hangup_timeout.setEnabled(enabled);
+		et_interval.setEnabled(enabled);
 	}
 
 	protected int getHangupTimeout() {
 
-		int timeout = 6;
-		if(Integer.valueOf(et_hangup_timeout.getText().toString())>8){
-			Toast.makeText(Main.this, getString(R.string.tel_warning_call_hangup), Toast.LENGTH_SHORT).show();
-			timeout = 6;
+		if(et_hangup_timeout.getText().length()==0){
 			et_hangup_timeout.setText("6");
+			return 6;
 		} else {
-			timeout = Integer.valueOf(et_hangup_timeout.getText().toString());
-			if(timeout==0){
+			int timeout = 6;
+			if(Integer.valueOf(et_hangup_timeout.getText().toString())>8){
+				Toast.makeText(Main.this, getString(R.string.tel_warning_call_hangup), Toast.LENGTH_LONG).show();
 				timeout = 6;
 				et_hangup_timeout.setText("6");
+			} else {
+				timeout = Integer.valueOf(et_hangup_timeout.getText().toString());
+				if(timeout==0){
+					timeout = 6;
+					et_hangup_timeout.setText("6");
+				}
 			}
+			return timeout;
 		}
-		return timeout;
 	}
 
 	static int callRepliedNum=0;
@@ -267,6 +307,8 @@ public class Main extends Activity{
 		if(timer!=null) {
 			timer.cancel();
 		}
+		
+		
 		super.onDestroy();
 	};
 
@@ -290,7 +332,7 @@ public class Main extends Activity{
 			case TelephonyManager.CALL_STATE_OFFHOOK:
 				Log.w("State changed: " , state+"Offhook");
 				//both parties start conversation
-				
+
 
 
 
@@ -307,7 +349,7 @@ public class Main extends Activity{
 						isRunning.set(false);		
 					}
 				}
-				
+
 				break;
 			default:
 				break;
@@ -383,10 +425,68 @@ public class Main extends Activity{
 		tv_hangup.setText(getResources().getString(R.string.tel_call_hang_timeout));
 		tv_interval.setText(getResources().getString(R.string.tel_call_interval));
 		tv_stats.setText(getResources().getString(R.string.tel_call_stats));
-		btn_start_stop.setText(btn_start_stop.getTag().equals("START")? R.string.tel_start:R.string.tel_stop);
+		et_callids.setHint(getResources().getString(R.string.tel_callid_hint));
+
+		btn_start_stop.setText(btn_start_stop.getTag().equals("START")? getResources().getString(R.string.tel_start):getResources().getString(R.string.tel_stop));
 	}
 
+	public static final String PREFS_NAME = "NaughtySnakePrefs";
+	public static final String NUMBERS = "NUMBERS";
+	public static final String INTERVAL = "INTERVALS";
+	public static final String HANGUPTIMEOUT ="HANGUP_TIMEOUT";
+	public static final String LASTSTATS ="LAST_STATS";
 
+	@Override
+	protected void onStop() {
+		save();
+		super.onStop();
+	}
+	private void save(){
+		SharedPreferences settings = getApplicationContext().getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(NUMBERS, et_callids.getText().toString());
+		editor.putString(INTERVAL, et_interval.getText().toString());
+		editor.putString(HANGUPTIMEOUT, et_hangup_timeout.getText().toString());
+		editor.putString(LASTSTATS, tv_stats_content.getText().toString());
+		editor.commit();
+	}
+
+	private void load(){
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		et_callids.setText(settings.getString(NUMBERS, ""));
+		et_interval.setText(settings.getString(INTERVAL, "10"));
+		et_hangup_timeout.setText(settings.getString(HANGUPTIMEOUT, "6"));
+		tv_stats_content.setText(settings.getString(LASTSTATS, "0"));
+
+	}
+	
+	
+	
+	@Override
+	public void onBackPressed() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Are you sure you want to exit?")
+		.setCancelable(false)
+		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				try{
+					finish();}
+				catch(Exception ex){
+
+				}
+			}
+		})
+		.setNeutralButton("Stay", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+
+		AlertDialog alert = builder.create();
+		alert.show();
+		
+		
+	}
 
 
 }

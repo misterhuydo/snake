@@ -67,7 +67,7 @@
                 android:layout_height="fill_parent"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="100.0dip"
-                
+                android:hint="@string/tel_callid_hint"
                 android:singleLine="true"
                 android:textColor="@color/text_violet"
                 android:textSize="14.0dip" />
